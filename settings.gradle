@@ -26,7 +26,7 @@ include "spring-webmvc-tiles2"
 include "spring-websocket"
 include "spring-framework-bom"
 include "luozl-spring-test"
-
+include 'luozl-springmvc'
 // Exposes gradle buildSrc for IDE support
 include "buildSrc"
 rootProject.children.find{ it.name == "buildSrc" }.name = "spring-build-src"
