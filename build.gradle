@@ -376,7 +376,13 @@ project("spring-core") {
 		}
 	}
 }
+project("luozl-spring-test") {
+	description = "luozl-spring-test"
 
+	dependencies {
+		compile(project(":spring-context"))
+	}
+}
 project("spring-beans") {
 	description = "Spring Beans"
 
@@ -478,7 +484,7 @@ project("spring-context") {
 		compile(project(":spring-core"))
 		compile(project(":spring-expression"))
 		compile(files(project(":spring-core").cglibRepackJar))
-		optional(project(":spring-instrument"))
+		compile(project(":spring-instrument"))
 		optional("javax.inject:javax.inject:1")
 		optional("javax.ejb:ejb-api:${ejbVersion}")
 		optional("javax.enterprise.concurrent:javax.enterprise.concurrent-api:1.0")
@@ -1065,7 +1071,7 @@ project("spring-test") {
 
 	check.dependsOn aggregateTestReports
 }
-
+/*
 project("spring-aspects") {
 	description = "Spring Aspects"
 	apply from: "aspects.gradle"
@@ -1094,7 +1100,7 @@ project("spring-aspects") {
 		buildCommands = [new org.gradle.plugins.ide.eclipse.model.BuildCommand("org.eclipse.ajdt.core.ajbuilder")]
 	}
 }
-
+*/
 project("spring-framework-bom") {
 	description = "Spring Framework (Bill of Materials)"
 
@@ -1236,7 +1242,7 @@ configure(rootProject) {
 				project(":spring-webmvc").sourceSets.main.compileClasspath.files.find { it =~ "servlet-api" },
 				rootProject.sourceSets.test.compileClasspath.files.find { it =~ "hibernate-core" },
 				// Ensure the javadoc process can resolve types compiled from .aj sources
-				project(":spring-aspects").sourceSets.main.output
+				//project(":spring-aspects").sourceSets.main.output
 			)
 			classpath += files(subprojects.collect { it.sourceSets.main.compileClasspath })
 		}
@@ -1360,11 +1366,11 @@ configure(rootProject) {
 		}
 	}
 
-	artifacts {
+/*	artifacts {
 		archives docsZip
 		archives schemaZip
 		archives distZip
-	}
+	}*/
 
 	task wrapper(type: Wrapper) {
 		description = "Generates gradlew[.bat] scripts"
