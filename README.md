@@ -100,3 +100,6 @@ The Spring Framework is released under version 2.0 of the [Apache License][].
 [The Spring Blog]: https://spring.io/blog/
 [news feed]: https://spring.io/blog/category/news
 [Apache License]: https://www.apache.org/licenses/LICENSE-2.0
+
+## maven和gradle项目相互转化
+https://www.cnblogs.com/yjmyzz/p/gradle-to-maven.html
