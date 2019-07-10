@@ -434,6 +434,8 @@ public class BeanDefinitionParserDelegate {
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
 	 */
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, BeanDefinition containingBean) {
+		//<bean id="myTestBean"  name="myTestBeanName" ...
+		// 获取id和name
 		String id = ele.getAttribute(ID_ATTRIBUTE);
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
@@ -451,7 +453,7 @@ public class BeanDefinitionParserDelegate {
 						"' as bean name and " + aliases + " as aliases");
 			}
 		}
-
+		//bean的id和name都不允许重复，bean1的id和bean2的name不允许一样
 		if (containingBean == null) {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
@@ -486,6 +488,7 @@ public class BeanDefinitionParserDelegate {
 					return null;
 				}
 			}
+
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
@@ -537,7 +540,7 @@ public class BeanDefinitionParserDelegate {
 
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
-
+			//不清楚meta的作用
 			parseMetaElements(ele, bd);
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
@@ -771,6 +774,49 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Parse lookup-override sub-elements of the given bean element.
+	 * //定义一个父类
+	 * public class Parent {
+	 *     public void shouMe()
+	 *     {
+	 *         System.out.println("I am parent");
+	 *     }
+	 * }
+	 * //定义子类并覆盖父类的方法
+	 * public class Child extends Parent {
+	 *     @Override
+	 *     public void shouMe() {
+	 *         System.out.println("I am child");
+	 *     }
+	 * }
+	 * //创建调用方法
+	 * public abstract class BeanTest {
+	 *     public void showMe()
+	 *     {
+	 *         this.getBean().shouMe();
+	 *     }
+	 *
+	 *     public abstract Parent getBean();
+	 * }
+	 * public class TestDemo {
+	 *     public static void main(String[] args) {
+	 *         ApplicationContext context = new ClassPathXmlApplicationContext("lookup-method.xml");
+	 *
+	 *         BeanTest test =(BeanTest) context.getBean("beanTest");
+	 *
+	 *         test.showMe();
+	 *     }
+	 * }
+	 * <beans xmlns="http://www.springframework.org/schema/beans"
+	 *        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 *        xsi:schemaLocation="
+	 *         http://www.springframework.org/schema/beans
+	 *         http://www.springframework.org/schema/beans/spring-beans.xsd">
+	 *
+	 *     <bean id="beanTest" class="com.yhl.myspring.demo.bean.BeanTest">
+	 *         <lookup-method name="getBean" bean="child"/>
+	 *     </bean>
+	 *     <bean id="child" class="com.yhl.myspring.demo.bean.Child"></bean>
+	 * </beans>
 	 */
 	public void parseLookupOverrideSubElements(Element beanEle, MethodOverrides overrides) {
 		NodeList nl = beanEle.getChildNodes();

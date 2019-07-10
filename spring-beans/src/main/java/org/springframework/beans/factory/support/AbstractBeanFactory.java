@@ -1620,6 +1620,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object beanInstance, String name, String beanName, RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
+		//bean名称已工厂bean（&）前缀开头但是bean实例又不是工厂bean则抛出异常
 		if (BeanFactoryUtils.isFactoryDereference(name) && !(beanInstance instanceof FactoryBean)) {
 			throw new BeanIsNotAFactoryException(transformedBeanName(name), beanInstance.getClass());
 		}
@@ -1630,6 +1631,18 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
 			return beanInstance;
 		}
+		/*上面两段if语句语义不清，可以简化为下面的语句，
+		//bean以&开头但不是工厂bean，抛出异常
+		if (BeanFactoryUtils.isFactoryDereference(name) && !(beanInstance instanceof FactoryBean)) {
+			throw new BeanIsNotAFactoryException(transformedBeanName(name), beanInstance.getClass());
+		}
+		//下面的情况直接返回bean实例：是工厂bean，且bean名称以&开头；或者不是工厂bean且bean名称不以&开头
+		if (((beanInstance instanceof FactoryBean) && BeanFactoryUtils.isFactoryDereference(name))
+		    ||
+		    (！(beanInstance instanceof FactoryBean) && ！BeanFactoryUtils.isFactoryDereference(name)) ) {
+			return beanInstance;
+		}
+		*/
 
 		Object object = null;
 		if (mbd == null) {

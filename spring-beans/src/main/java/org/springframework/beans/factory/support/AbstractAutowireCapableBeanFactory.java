@@ -1617,6 +1617,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}, getAccessControlContext());
 		}
 		else {
+			//对特殊的类（BeanNameAware，BeanClassLoaderAware，BeanFactoryAware）加上属性
 			invokeAwareMethods(beanName, bean);
 		}
 
@@ -1638,7 +1639,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		return wrappedBean;
 	}
-
+	/*
+	Spring中提供了一些Aware接口，比如BeanFactoryAware,ApplicationContextAware,
+	ResourceLoaderAware,ServletContextAware等，实现这些Aware接口的bean在被初始化后，
+	可以取得一些相对应的资源，例如实现BeanFactoryAware的bean在初始化之后，Spring容器将
+	会注入BeanFactory实例，而实现ApplicationContextAware的bean，在bean被初始化后，
+	将会被注入ApplicationContext实例等。
+	*/
 	private void invokeAwareMethods(final String beanName, final Object bean) {
 		if (bean instanceof Aware) {
 			if (bean instanceof BeanNameAware) {

@@ -13,5 +13,7 @@ public class BeanFactoryTest {
         System.out.println(myTestBean.getTestStr());
         myTestBean.setTestStr("123");
         System.out.println(myTestBean.getTestStr());
+        BeanNameAwareTest beanNameAwareTest= (BeanNameAwareTest) beanFactory.getBean("beanNameAwareTest");
+
     }
 }

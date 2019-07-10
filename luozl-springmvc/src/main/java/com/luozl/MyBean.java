@@ -1,8 +1,15 @@
 package com.luozl;
 
-public class MyBean {
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyBean  implements InitializingBean {
     private int age;
     private String name;
+    public MyBean(){
+        System.out.println("MtBean init..");
+    }
 
     public MyBean(int age, String name) {
         this.age = age;
@@ -23,5 +30,10 @@ public class MyBean {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("MyBean afterPropertiesSet");
     }
 }
