@@ -9,12 +9,9 @@
             </list>
         </property>
     </bean>
-    <bean  id="myTestBean" name="name1,name2" class="org.springframework.luozlspringtest.MyTestBean"/>
-    <bean id="beanNameAwareTest"  class="org.springframework.luozlspringtest.BeanNameAwareTest">
-        <property name="beanName" value="beanname"/>
-        <meta key="attr1" value="attr1value"/>
-    </bean>
+    <bean class="org.springframework.luozlspringtest.BeanFactoryPostProcessor.MyBeanFactoryPostProcessor" id="beanFactoryPostProcessor"/>
     <bean class="org.springframework.luozlspringtest.User" id="user">
         <property name="name" value="${user.name}"/>
     </bean>
+    <bean class="org.springframework.luozlspringtest.BeanFactoryPostProcessor.MyInstantiationAwareBeanPostProcessor"/>
 </beans>

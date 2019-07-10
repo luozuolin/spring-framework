@@ -41,6 +41,7 @@ import org.springframework.beans.BeansException;
  * @since 06.07.2003
  * @see BeanPostProcessor
  * @see PropertyResourceConfigurer
+ * bean工厂初始化后置处理，在工厂初始化后执行操作
  */
 public interface BeanFactoryPostProcessor {
 
