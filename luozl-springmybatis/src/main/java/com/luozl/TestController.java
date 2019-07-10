@@ -1,7 +1,6 @@
 package com.luozl;
 
-import com.luozl.mapper1.UserDao;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,12 +30,5 @@ public class TestController {
         System.out.println("sayHello:"+bean.toString());
         return mav;
     }
-    @Autowired
-    private UserDao userDao;
-    @RequestMapping("getUsers")
-    @ResponseBody
-    public   long  getUsers(){
-        long list = userDao.getUserList();
-        return list;
-    }
+
 }
