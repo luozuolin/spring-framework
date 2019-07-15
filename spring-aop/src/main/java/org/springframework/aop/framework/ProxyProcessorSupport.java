@@ -115,6 +115,7 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 			}
 		}
 		else {
+			//代理类直接代理目标类，而不是代理目标类的接口
 			proxyFactory.setProxyTargetClass(true);
 		}
 	}
