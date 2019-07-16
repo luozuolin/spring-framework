@@ -176,6 +176,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   //
   // HANDLE RESULT SETS
+  //处理返回结果
   //
   @Override
   public List<Object> handleResultSets(Statement stmt) throws SQLException {
