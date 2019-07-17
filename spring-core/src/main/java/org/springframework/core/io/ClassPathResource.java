@@ -160,15 +160,19 @@ public class ClassPathResource extends AbstractFileResolvingResource {
 	public InputStream getInputStream() throws IOException {
 		InputStream is;
 		if (this.clazz != null) {
+			//如果类对象不为null,则使用类对象信息的getResourceAsStream获取输入流
 			is = this.clazz.getResourceAsStream(this.path);
 		}
 		else if (this.classLoader != null) {
+			//如果类加载器不为null,则使用类加载器的getResourceAsStream获取输入流
 			is = this.classLoader.getResourceAsStream(this.path);
 		}
 		else {
+			//否则使用ClassLoader类的getSystemResourceAsStream方法获取输入流
 			is = ClassLoader.getSystemResourceAsStream(this.path);
 		}
 		if (is == null) {
+			//以上三种方法都无法获取到输入流的话,那么说明文件不存在,抛出异常
 			throw new FileNotFoundException(getDescription() + " cannot be opened because it does not exist");
 		}
 		return is;

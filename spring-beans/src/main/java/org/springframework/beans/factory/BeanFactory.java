@@ -111,6 +111,7 @@ import org.springframework.core.ResolvableType;
  * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization
  * @see DisposableBean#destroy
  * @see org.springframework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
+//SpringIoC容器顶级接口
  */
 public interface BeanFactory {
 
@@ -119,6 +120,8 @@ public interface BeanFactory {
 	 * beans <i>created</i> by the FactoryBean. For example, if the bean named
 	 * {@code myJndiObject} is a FactoryBean, getting {@code &myJndiObject}
 	 * will return the factory, not the instance returned by the factory.
+	 * 区分是获取FactoryBean还是FactoryBean的createBean创建的实例.
+	 * 如果&开始则获取FactoryBean;否则获取createBean创建的实例.
 	 */
 	String FACTORY_BEAN_PREFIX = "&";
 

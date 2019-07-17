@@ -381,6 +381,7 @@ project("luozl-spring-test") {
 
 	dependencies {
 		compile(project(":spring-context"))
+		compile(project(":spring-core"))
 		compile(project(":spring-jdbc"))
 		compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.8.9'
 		optional group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- ====================lookup-method属性注入==================== -->
+    <bean id="car" class="org.springframework.luozlspringtest.springsource.spring07.Car">
+        <!--注意:下面这句配置和lookup-method注入没有关系,我们只是为了出于演示和说明配置该bean-->
+        <property name="taxi" ref="taxi"/>
+        <!--lookup-method注入-->
+        <lookup-method name="createTaxi" bean="taxi"/>
+    </bean>
+    <bean id="taxi" class="org.springframework.luozlspringtest.springsource.spring07.Taxi" scope="prototype"/>
+
+
+    <!-- ====================replace-method属性注入==================== -->
+    <bean id="dogReplaceMethod" class="org.springframework.luozlspringtest.springsource.spring07.ReplaceDog"/>
+    <bean id="originalDogReplaceMethod" class="org.springframework.luozlspringtest.springsource.spring07.OriginalDog">
+        <replaced-method name="sayHello" replacer="dogReplaceMethod">
+            <arg-type match="java.lang.String"></arg-type>
+        </replaced-method>
+    </bean>
+</beans>

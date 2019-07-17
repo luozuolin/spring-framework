@@ -27,6 +27,7 @@ package org.springframework.beans.factory;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 07.07.2003
+ * 扩展了BeanFactory接口,提供了对父容器的访问功能
  * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#setParentBeanFactory
  */
 public interface HierarchicalBeanFactory extends BeanFactory {

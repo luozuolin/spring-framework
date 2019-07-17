@@ -1,1 +1,27 @@
 本系列用例参考csdn博客：https://blog.csdn.net/lyc_liyanchao/
+## BeanPostProcessor接口与BeanFactoryPostProcessor接口
+BeanPostProcessor接口用于在bean实例化后修改bean实例的属性，
+BeanFactoryPostProcessor接口用于在Bean实例化前，BeanFactory实例化后
+修改Bean的定义，此时bean还么有实例化，不能修改到实例化的bean
+##1.BeanPostProcessor接口：
+后置bean处理器，允许自定义修改新的bean实例，
+应用程序上下文可以在其bean定义中自动检测BeanPostProcessor类型的bean，
+并将它们应用于随后创建的任何bean。（例如：配置文件中注册了一个自定义
+BeanPostProcessor类型的bean，一个User类型的bean，应用程序上下文会
+在创建User实例之后对User应用BeanPostProcessor）。
+##2.BeanFactoryPostProcessor接口：
+后置工厂处理器，允许自定义修改应用
+程序上下文的bean定义，调整bean属性值。应用程序上下文可以在其bean定义
+中自动检测BeanFactoryPostProcessor，并在创建任何非
+BeanFactoryPostProcessor类型bean之前应用它们（例如：
+配置文件中注册了一个自定义BeanFactoryPostProcessor类型的bean，
+一个User类型的bean，应用程序上下文会在创建User实例之前对User应用
+BeanFactoryPostProcessor）。
+##BeanFactory总结
+BeanFactory–>SpringIoC容器顶级接口,定义了对单个bean的获取,对bean的作用域判断,获取bean类型,获取bean别名的功能
+ListableBeanFactory–>扩展了BeanFactory接口,并提供了对bean的枚举能力
+HierarchicalBeanFactory–>扩展了BeanFactory接口,并提供了访问父容器的能力
+AutowireCapableBeanFactory–>扩展了BeanFactory接口,并提供了自动装配能力
+ConfigurableBeanFactory–>扩展了HierarchicalBeanFactory,并提供了对容器的配置能力
+ConfigurableListableBeanFactory–>扩展了ListableBeanFactory, AutowireCapableBeanFactory, ConfigurableBeanFactory接口,并提供了忽略依赖,自动装配判断,冻结bean的定义,枚举所有bean名称的功能
+
