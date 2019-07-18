@@ -112,8 +112,10 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		 * @return new instance of the dynamically generated subclass
 		 */
 		public Object instantiate(Constructor<?> ctor, Object... args) {
+			// 1、生成增强子类
 			Class<?> subclass = createEnhancedSubclass(this.beanDefinition);
 			Object instance;
+			// 2、实例化增强子类
 			if (ctor == null) {
 				instance = BeanUtils.instantiateClass(subclass);
 			}
@@ -127,6 +129,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 							"Failed to invoke constructor for CGLIB enhanced subclass [" + subclass.getName() + "]", ex);
 				}
 			}
+			// 3、设置回调
 			// SPR-10785: set callbacks directly on the instance instead of in the
 			// enhanced class (via the Enhancer) in order to avoid memory leaks.
 			Factory factory = (Factory) instance;
@@ -306,9 +309,12 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 
 		@Override
 		public Object intercept(Object obj, Method method, Object[] args, MethodProxy mp) throws Throwable {
+			// 1、获取覆盖方法信息
 			ReplaceOverride ro = (ReplaceOverride) getBeanDefinition().getMethodOverrides().getOverride(method);
 			// TODO could cache if a singleton for minor performance optimization
+			// 2、实例化覆盖方法
 			MethodReplacer mr = this.owner.getBean(ro.getMethodReplacerBeanName(), MethodReplacer.class);
+			// 3、调用覆盖方法
 			return mr.reimplement(obj, method, args);
 		}
 	}

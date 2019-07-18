@@ -235,11 +235,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(
 			final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
 			throws BeansException {
-
+		//转换bean的名称,去掉&前缀,且如果bean有别名的话,优先使用别名
 		final String beanName = transformedBeanName(name);
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
+		//从缓存中获取bean
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isDebugEnabled()) {
@@ -257,11 +258,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
+			//判断指定的原型模式的bean是否当前正在创建(在当前线程内),
+			// 如果是->则抛出异常(Spring不会解决原型模式bean的循环依赖)
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
 
 			// Check if bean definition exists in this factory.
+			//在父工厂中获取bean，
 			BeanFactory parentBeanFactory = getParentBeanFactory();
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 				// Not found -> check parent.
@@ -275,12 +279,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					return parentBeanFactory.getBean(nameToLookup, requiredType);
 				}
 			}
-
+			//如果当前bean不是用于类型检查,则将该bean标记为已经被创建或者即将被创建
 			if (!typeCheckOnly) {
 				markBeanAsCreated(beanName);
 			}
 
 			try {
+				//此处的意义是什么：不初始化abstract类型的bean？
 				final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 				checkMergedBeanDefinition(mbd, beanName, args);
 
@@ -288,12 +293,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
+						//循环依赖的话就抛出异常
 						if (isDependent(beanName, dep)) {
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 									"Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
 						}
+						//注册依赖，beanName依赖于dep，beanName销毁之前dep必须先销毁
 						registerDependentBean(dep, beanName);
 						try {
+							//获取依赖的dep，如果获取不到dep则抛出异常。
+							//此处getBean也会调用到doGetBean方法
 							getBean(dep);
 						}
 						catch (NoSuchBeanDefinitionException ex) {
@@ -304,6 +313,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 
 				// Create bean instance.
+				//bean的scope：singleton，prototype、request、session、global session
+				//創建单例bean
 				if (mbd.isSingleton()) {
 					sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
 						@Override
@@ -320,9 +331,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							}
 						}
 					});
+					//获取bean
 					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
-
+				//创建原型bean
 				else if (mbd.isPrototype()) {
 					// It's a prototype -> create a new instance.
 					Object prototypeInstance = null;
@@ -331,11 +343,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						prototypeInstance = createBean(beanName, mbd, args);
 					}
 					finally {
+						//从正在创建的原型bean得set中移除刚刚创建完成的原型bean
 						afterPrototypeCreation(beanName);
 					}
 					bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
 				}
-
+				// 其他类型bean的处理：request、session、global session
 				else {
 					String scopeName = mbd.getScope();
 					final Scope scope = this.scopes.get(scopeName);
@@ -343,6 +356,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						throw new IllegalStateException("No Scope registered for scope name '" + scopeName + "'");
 					}
 					try {
+						//通过request、session、global session等的request、session来获取对应的name值来获取bean
+						//从而实现bean的范围的控制（ServletContextScope.java，AbstractRequestAttributesScope.java）
 						Object scopedInstance = scope.get(beanName, new ObjectFactory<Object>() {
 							@Override
 							public Object getObject() throws BeansException {
@@ -1042,6 +1057,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@SuppressWarnings("unchecked")
 	protected void beforePrototypeCreation(String beanName) {
+		//获取当前正在创建的原型bean：null，string，Set<String>
 		Object curVal = this.prototypesCurrentlyInCreation.get();
 		if (curVal == null) {
 			this.prototypesCurrentlyInCreation.set(beanName);

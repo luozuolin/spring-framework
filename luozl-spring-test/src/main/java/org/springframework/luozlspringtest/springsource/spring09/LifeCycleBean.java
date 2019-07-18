@@ -13,6 +13,11 @@ public class LifeCycleBean implements
         DisposableBean {
     // 姓名
     private String name;
+
+    public LifeCycleBean() {
+        System.out.println("调用初始化方法。。。");
+    }
+
     // 年龄
     private int age;
     public void myInit() {

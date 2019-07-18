@@ -231,6 +231,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				//创建单例之前需要验证是否正在创建单例，和将单例加入正在创建singletonsCurrentlyInCreation是否能成功
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -238,6 +239,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<Exception>();
 				}
 				try {
+					//调用覆盖的getObject方法创建bean：createBean
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				}
@@ -261,8 +263,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+					//清理单例bean创建过程中设置的理解map值
 					afterSingletonCreation(beanName);
 				}
+				//如果单例创建完成，则将单例加入单例的map：singletonObjects，并且从其他的缓存中移除该单例
 				if (newSingleton) {
 					addSingleton(beanName, singletonObject);
 				}
