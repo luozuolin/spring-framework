@@ -108,12 +108,14 @@ class ConstructorResolver {
 		Constructor<?> constructorToUse = null;
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
-
+		// 判断有无显式指定参数,如果有则优先使用,如xmlBeanFactory.getBean("cat", "美美",3);
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		}
 		else {
 			Object[] argsToResolve = null;
+			// 优先尝试从缓存中获取,spring对参数的解析过程是比较复杂也耗时的,
+			// 所以这里先尝试从缓存中获取已经解析过的构造函数参数
 			synchronized (mbd.constructorArgumentLock) {
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse != null && mbd.constructorArgumentsResolved) {
@@ -124,11 +126,12 @@ class ConstructorResolver {
 					}
 				}
 			}
+			// 缓存中存在,则解析构造函数参数类型
 			if (argsToResolve != null) {
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, constructorToUse, argsToResolve);
 			}
 		}
-
+		//缓存中不存在,则需要解析构造函数参数,以确定使用哪一个构造函数来进行实例化
 		if (constructorToUse == null) {
 			// Need to resolve the constructor.
 			boolean autowiring = (chosenCtors != null ||
@@ -142,14 +145,27 @@ class ConstructorResolver {
 			else {
 				ConstructorArgumentValues cargs = mbd.getConstructorArgumentValues();
 				resolvedValues = new ConstructorArgumentValues();
+				//通过传入的构造函数参数个数来确定需要实例化的构造函数的参数个数
 				minNrOfArgs = resolveConstructorArguments(beanName, mbd, bw, cargs, resolvedValues);
 			}
 
 			// Take specified constructors, if any.
+			// 5、 使用指定的构造函数(如果有的话)。
+			// 注意: 5.1、 这里说的指定构造函数,并不是我们在配置文件中指定的构造函数,而是通过解析
+			// SmartInstantiationAwareBeanPostProcessor得出的构造函数
+			// 		     参见AbstractAutowireCapableBeanFactory-->
+			// 		     determineConstructorsFromBeanPostProcessors(beanClass, beanName),
+			//           就是在本方法被调用之前执行的解析操作
+			//      5.2、 即便解析出来的构造函数不为空,但是大家要注意,candidates是个数组,
+			//      下一步依然还是要对candidates进行解析,以确定使用哪一个构造函数进行实例化
 			Constructor<?>[] candidates = chosenCtors;
 			if (candidates == null) {
 				Class<?> beanClass = mbd.getBeanClass();
 				try {
+					// 6、 如果指定的构造函数不存在,则根据方法访问级别,获取该bean所有的构造函数
+					// 对于本例来分析,应该会获取到四个构造函数Cat(),Cat(String name),Cat(int age),Cat(String name, int age)
+					// 注意:该处获取到的构造函数,并不是配置文件中定义的构造函数,而是bean类中的构造函数
+					 //获取当前bean的所有构造函数
 					candidates = (mbd.isNonPublicAccessAllowed() ?
 							beanClass.getDeclaredConstructors() : beanClass.getConstructors());
 				}
@@ -159,6 +175,7 @@ class ConstructorResolver {
 							"] from ClassLoader [" + beanClass.getClassLoader() + "] failed", ex);
 				}
 			}
+			//构造方法排序：public->no-public,decresasing
 			AutowireUtils.sortConstructors(candidates);
 			int minTypeDiffWeight = Integer.MAX_VALUE;
 			Set<Constructor<?>> ambiguousConstructors = null;
@@ -167,11 +184,16 @@ class ConstructorResolver {
 			for (Constructor<?> candidate : candidates) {
 				Class<?>[] paramTypes = candidate.getParameterTypes();
 
+				//有构造函数，但是需要的构造函数参数个数大于此构造函数的参数个数则跳出循环：说明已经找到了构造函数
 				if (constructorToUse != null && argsToUse.length > paramTypes.length) {
 					// Already found greedy constructor that can be satisfied ->
 					// do not look any further, there are only less greedy constructors left.
 					break;
 				}
+				//参数类型个数不匹配
+				// 如果从bean类中解析到的构造函数个数小于从beanDefinition中解析到的构造函数个数,
+				// 那么肯定不会使用该方法实例化,循环继续
+				// 简单的理解:beanDefinition中的构造函数和bean类中的构造函数参数个数不相等,那么肯定不会使用该构造函数实例化
 				if (paramTypes.length < minNrOfArgs) {
 					continue;
 				}
@@ -209,6 +231,14 @@ class ConstructorResolver {
 					}
 					argsHolder = new ArgumentsHolder(explicitArgs);
 				}
+				// 10、 通过构造函数参数权重对比,得出最适合使用的构造函数
+				// 先判断是返回是在宽松模式下解析构造函数还是在严格模式下解析构造函数。(默认是宽松模式)
+				// 10.1、对于宽松模式:例如构造函数为(String name,int age),配置文件中定义(value="美美",value="3")
+				// 	 那么对于age来讲,配置文件中的"3",可以被解析为int也可以被解析为String,
+				//   这个时候就需要来判断参数的权重,使用ConstructorResolver的静态内部类ArgumentsHolder分别对字符型和数字型的参数做权重判断
+				//   权重越小,则说明构造函数越匹配
+				// 10.2、对于严格模式:严格返回权重值,不会根据分别比较而返回比对值
+				// 10.3、minTypeDiffWeight = Integer.MAX_VALUE;而权重比较返回结果都是在Integer.MAX_VALUE做减法,起返回最大值为Integer.MAX_VALUE
 
 				int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 						argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
@@ -423,6 +453,7 @@ class ConstructorResolver {
 
 			Method[] rawCandidates = getCandidateMethods(factoryClass, mbd);
 			List<Method> candidateSet = new ArrayList<Method>();
+			//遍历工厂类，获取我们需要的实例化当前类的工厂方法（factory-method）
 			for (Method candidate : rawCandidates) {
 				if (Modifier.isStatic(candidate.getModifiers()) == isStatic && mbd.isFactoryMethod(candidate)) {
 					candidateSet.add(candidate);
@@ -435,7 +466,7 @@ class ConstructorResolver {
 			boolean autowiring = (mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_CONSTRUCTOR);
 			int minTypeDiffWeight = Integer.MAX_VALUE;
 			Set<Method> ambiguousFactoryMethods = null;
-
+			//下面实例化方法与类通过构造函数实例化雷同
 			int minNrOfArgs;
 			if (explicitArgs != null) {
 				minNrOfArgs = explicitArgs.length;

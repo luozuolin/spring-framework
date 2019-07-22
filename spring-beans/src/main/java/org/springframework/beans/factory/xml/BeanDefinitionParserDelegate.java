@@ -1456,12 +1456,15 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	public BeanDefinition parseCustomElement(Element ele, BeanDefinition containingBd) {
-		String namespaceUri = getNamespaceURI(ele);
+        // 获取namespaceUri
+	    String namespaceUri = getNamespaceURI(ele);
+        // 根据namespaceUri得到命名空间解析器
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		//使用命名空间解析器解析自定义标签
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 

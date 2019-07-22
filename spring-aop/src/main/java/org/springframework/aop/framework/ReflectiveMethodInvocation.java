@@ -149,7 +149,16 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		this.arguments = arguments;
 	}
 
-
+	/***
+	 * 调用拦截器链
+	 *  currentInterceptorIndex维护了一个计数器，该计数器从-1开始，
+	 *  当计数器值等于拦截方法长度减一时，
+	 *  表明所有的增强方法已经被调用（但是不一定被真正执行），那么此时
+	 *  调用连接点的方法，针对本例：即sayHello方法
+	 *
+	 * @return
+	 * @throws Throwable
+	 */
 	@Override
 	public Object proceed() throws Throwable {
 		//	We start with an index of -1 and increment early.

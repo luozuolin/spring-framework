@@ -260,6 +260,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			// We're assumably within a circular reference.
 			//判断指定的原型模式的bean是否当前正在创建(在当前线程内),
 			// 如果是->则抛出异常(Spring不会解决原型模式bean的循环依赖)
+            //原型classA引用原型classB，classA正在创建，需要原型classB，
+            //classB开始创建需要引用classA，发现classA的原型类型正在常见就抛出异常
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
