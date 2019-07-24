@@ -1,0 +1,5 @@
+CREATE TABLE `account` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `balance` int(11) DEFAULT NULL COMMENT '账户余额',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='--账户表'

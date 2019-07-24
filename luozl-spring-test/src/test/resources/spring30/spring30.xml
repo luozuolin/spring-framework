@@ -8,7 +8,7 @@
     <!-- 切面类-->
     <bean id="catAspect" class="org.springframework.luozlspringtest.springsource.spring30.CatAspect"/>
 
-    <!--AOP配置（一）-->
+    <!--AOP配置（一）proxy-target-class:此属性标记是否直接对目标类进行代理，而不是通过接口产生代理-->
     <aop:config proxy-target-class="true">
         <!-- 切入点-->
         <aop:pointcut id="pointcut" expression="execution(* org.springframework.luozlspringtest.springsource.spring30..*.*(..)) and args(name,age)"/>

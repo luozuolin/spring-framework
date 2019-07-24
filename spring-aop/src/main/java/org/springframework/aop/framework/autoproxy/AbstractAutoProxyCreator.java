@@ -239,9 +239,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
 		if (beanName == null || !this.targetSourcedBeans.contains(beanName)) {
+			//判断该类是否经过处理
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
+			//判断beanClass是否需要被代理
+			// isInfrastructureClass-->判断beanClass是否为AOP基础类例如Advice(增强)，Advisors(切面),Pointcut(切点)
+			// shouldSkip-->判断beanClass是否指定了不需要代理
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
@@ -289,6 +293,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * identified as one to proxy by the subclass.
 	 * @see #getAdvicesAndAdvisorsForBean
 	 * 类实例化完成后调用，
+	 * 如果bean被子类标识为要代理的bean，则使用配置的拦截器创建代理
 	 */
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -331,7 +336,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @return a proxy wrapping the bean, or the raw bean instance as-is
 	 */
 	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
-		//如果已经处理过
+		//如果已经处理过,如果已经处理过或者不需要创建代理，则返回
 		if (beanName != null && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
@@ -344,8 +349,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		// Create proxy if we have advice.
+		//根据指定的bean获取所有的适合该bean的增强
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
+			//为指定bean创建代理
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
 			Object proxy = createProxy(
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
@@ -437,7 +444,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 */
 	protected Object createProxy(
 			Class<?> beanClass, String beanName, Object[] specificInterceptors, TargetSource targetSource) {
-
+		// 当前beanFactory是ConfigurableListableBeanFactory类型，则尝试暴露当前bean的target class
 		if (this.beanFactory instanceof ConfigurableListableBeanFactory) {
 			//暴露目标类
 			AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
@@ -446,12 +453,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		ProxyFactory proxyFactory = new ProxyFactory();
 		//从当前类创建代理工厂
 		proxyFactory.copyFrom(this);
-
+		//是否直接代理目标类以及接口
 		if (!proxyFactory.isProxyTargetClass()) {
 			//判断当前类是应
 			if (shouldProxyTargetClass(beanClass, beanName)) {
 				proxyFactory.setProxyTargetClass(true);
 			}
+			// 检查给定bean类上的接口，如果合适的话，将它们应用到ProxyFactory。即添加代理接口
 			else {
 				evaluateProxyInterfaces(beanClass, proxyFactory);
 			}

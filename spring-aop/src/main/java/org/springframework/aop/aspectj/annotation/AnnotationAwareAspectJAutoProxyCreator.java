@@ -90,7 +90,8 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 		List<Advisor> advisors = super.findCandidateAdvisors();
 		// Build Advisors for all AspectJ aspects in the bean factory.
 		//获取所有的advisor，所在的类和切面 InstantiationModelAwarePointcutAdvisorImpl
-		advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
+        //从当前BeanFactory中查找所有标记了@AspectJ的注解的bean，并返回增强注解集合
+        advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
 		return advisors;
 	}
 
@@ -112,6 +113,10 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	 * <p>If no &lt;aop:include&gt; elements were used then "includePatterns" will be
 	 * {@code null} and all beans are included. If "includePatterns" is non-null,
 	 * then one of the patterns must match.
+     *  判断该beanName是否符合条件
+     *  如果配置文件指定了<aop:include/>属性，那么只有符合表达式条件的切面类的增强才会被提取
+     *  例如：配置<aop:include name="dogAspect"></aop:include>
+     *  那么只有dogAspect切面类的增强才会被提取
 	 */
 	protected boolean isEligibleAspectBean(String beanName) {
 		if (this.includePatterns == null) {

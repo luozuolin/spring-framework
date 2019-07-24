@@ -73,6 +73,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 
 
 	/**
+	 * 在当前BeanFactory中查找AspectJ-annotated的注解信息，并返回增强集合
 	 * Look for AspectJ-annotated aspect beans in the current bean factory,
 	 * and return to a list of Spring AOP Advisors representing them.
 	 * <p>Creates a Spring Advisor for each AspectJ advice method.
@@ -81,7 +82,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 	 */
 	public List<Advisor> buildAspectJAdvisors() {
 		List<String> aspectNames = this.aspectBeanNames;
-
+		//提取增强
 		if (aspectNames == null) {
 			synchronized (this) {
 				aspectNames = this.aspectBeanNames;
@@ -92,6 +93,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 							this.beanFactory, Object.class, true, false);
 					for (String beanName : beanNames) {
+						//不是需要增强的bean，则继续下一个
 						if (!isEligibleBean(beanName)) {
 							continue;
 						}
@@ -101,10 +103,22 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						if (beanType == null) {
 							continue;
 						}
-						//是否有aspect标注
+						//是否有Aspect标注
 						if (this.advisorFactory.isAspect(beanType)) {
 							aspectNames.add(beanName);
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);
+							/**
+							 * 切面实例化模型简介
+							 *
+							 * singleton: 即切面只会有一个实例；
+							 * perthis  : 每个切入点表达式匹配的连接点对应的AOP对象都会创建一个新切面实例；
+							 *            使用@Aspect("perthis(切入点表达式)")指定切入点表达式；
+							 *            例如: @Aspect("perthis(this(com.lyc.cn.v2.day04.aspectj.Dog))")
+							 * pertarget: 每个切入点表达式匹配的连接点对应的目标对象都会创建一个新的切面实例；
+							 *            使用@Aspect("pertarget(切入点表达式)")指定切入点表达式；
+							 *
+							 * 默认是singleton实例化模型，Schema风格只支持singleton实例化模型，而@AspectJ风格支持这三种实例化模型。
+							 */
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);

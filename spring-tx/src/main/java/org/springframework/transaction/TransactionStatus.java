@@ -35,6 +35,7 @@ import java.io.Flushable;
  * @see PlatformTransactionManager#getTransaction
  * @see org.springframework.transaction.support.TransactionCallback#doInTransaction
  * @see org.springframework.transaction.interceptor.TransactionInterceptor#currentTransactionStatus()
+ * 事务状态
  */
 public interface TransactionStatus extends SavepointManager, Flushable {
 
@@ -42,6 +43,7 @@ public interface TransactionStatus extends SavepointManager, Flushable {
 	 * Return whether the present transaction is new; otherwise participating
 	 * in an existing transaction, or potentially not running in an actual
 	 * transaction in the first place.
+	 * 当前事物是否为新事物
 	 */
 	boolean isNewTransaction();
 
@@ -55,6 +57,7 @@ public interface TransactionStatus extends SavepointManager, Flushable {
 	 * @see #createSavepoint()
 	 * @see #rollbackToSavepoint(Object)
 	 * @see #releaseSavepoint(Object)
+	 * 当前事物是否有保存点，被当做nested transaction创建的事物会有保存点
 	 */
 	boolean hasSavepoint();
 
@@ -68,12 +71,14 @@ public interface TransactionStatus extends SavepointManager, Flushable {
 	 * where the actual commit/rollback decision is made by the container.
 	 * @see org.springframework.transaction.support.TransactionCallback#doInTransaction
 	 * @see org.springframework.transaction.interceptor.TransactionAttribute#rollbackOn
+	 * 将事物标记为rollback-only，只允许执行回滚操作
 	 */
 	void setRollbackOnly();
 
 	/**
 	 * Return whether the transaction has been marked as rollback-only
 	 * (either by the application or by the transaction infrastructure).
+	 * 当前事物是否被标记为rollback-only
 	 */
 	boolean isRollbackOnly();
 
@@ -84,6 +89,7 @@ public interface TransactionStatus extends SavepointManager, Flushable {
 	 * transaction manager does not have a flush concept. A flush signal may
 	 * get applied to the primary resource or to transaction synchronizations,
 	 * depending on the underlying resource.
+	 * 将会话刷新到数据存储区
 	 */
 	@Override
 	void flush();
@@ -93,6 +99,7 @@ public interface TransactionStatus extends SavepointManager, Flushable {
 	 * whether it has already been committed or rolled back.
 	 * @see PlatformTransactionManager#commit
 	 * @see PlatformTransactionManager#rollback
+	 *当前事物是否完成：是否committed or rolled back 完成
 	 */
 	boolean isCompleted();
 

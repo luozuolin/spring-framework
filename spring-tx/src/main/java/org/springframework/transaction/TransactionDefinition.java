@@ -40,8 +40,20 @@ import java.sql.Connection;
  * @see PlatformTransactionManager#getTransaction(TransactionDefinition)
  * @see org.springframework.transaction.support.DefaultTransactionDefinition
  * @see org.springframework.transaction.interceptor.TransactionAttribute
+ * 事务定义
  */
 public interface TransactionDefinition {
+	/***
+	 * Spring事物传播特性
+	 * 		传播特性名称	                          			说明
+	 * PROPAGATION_REQUIRED			如果当前没有事物，则新建一个事物；如果已经存在一个事物，则加入到这个事物中
+	 * PROPAGATION_SUPPORTS			支持当前事物，如果当前没有事物，则以非事物方式执行
+	 * PROPAGATION_MANDATORY		使用当前事物，如果当前没有事物，则抛出异常
+	 * PROPAGATION_REQUIRES_NEW		新建事物，如果当前已经存在事物，则挂起当前事物
+	 * PROPAGATION_NOT_SUPPORTED	以非事物方式执行，如果当前存在事物，则挂起当前事物
+	 * PROPAGATION_NEVER			以非事物方式执行，如果当前存在事物，则抛出异常
+	 * PROPAGATION_NESTED			如果当前存在事物，则在嵌套事物内执行；如果当前没有事物，则与PROPAGATION_REQUIRED传播特性相同
+	 */
 
 	/**
 	 * Support a current transaction; create a new one if none exists.

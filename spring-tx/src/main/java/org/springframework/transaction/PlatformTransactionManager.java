@@ -39,6 +39,7 @@ package org.springframework.transaction;
  * @since 16.05.2003
  * @see org.springframework.transaction.support.TransactionTemplate
  * @see org.springframework.transaction.interceptor.TransactionInterceptor
+ * spring事务管理中心接口
  */
 public interface PlatformTransactionManager {
 
@@ -64,6 +65,7 @@ public interface PlatformTransactionManager {
 	 * @see TransactionDefinition#getIsolationLevel
 	 * @see TransactionDefinition#getTimeout
 	 * @see TransactionDefinition#isReadOnly
+	 * 根据事务的传播属性，返回当前事物或者新建一个事务返回
 	 */
 	TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException;
 
@@ -93,6 +95,7 @@ public interface PlatformTransactionManager {
 	 * @throws IllegalTransactionStateException if the given transaction
 	 * is already completed (that is, committed or rolled back)
 	 * @see TransactionStatus#setRollbackOnly
+	 * 根据事务状态提交或者回滚事务：如果事务被标记为rollback-only，则执行回滚
 	 */
 	void commit(TransactionStatus status) throws TransactionException;
 
@@ -111,6 +114,7 @@ public interface PlatformTransactionManager {
 	 * (typically caused by fundamental resource failures)
 	 * @throws IllegalTransactionStateException if the given transaction
 	 * is already completed (that is, committed or rolled back)
+	 * 回滚当前事物
 	 */
 	void rollback(TransactionStatus status) throws TransactionException;
 
