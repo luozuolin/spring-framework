@@ -1,0 +1,1 @@
+##Connection readonly ,TransactionDefinition  SET TRANSACTION READ ONLY  区别在哪？？

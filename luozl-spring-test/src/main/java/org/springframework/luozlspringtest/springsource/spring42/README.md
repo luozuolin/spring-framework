@@ -1,0 +1,3 @@
+##tx:annotation-driven 标签解析过程
+通过全文搜索，下面这些handler对进行了注册：
+CacheNamespaceHandler，JmsNamespaceHandler，TxNamespaceHandler，MvcNamespaceHandler

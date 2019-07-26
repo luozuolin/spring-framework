@@ -67,6 +67,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 
 	@Override
 	protected Object[] getAdvicesAndAdvisorsForBean(Class<?> beanClass, String beanName, TargetSource targetSource) {
+		//获取符合条件的增强并返回
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
@@ -91,6 +92,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		//查找所有可以适用于当前bean的增强项
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		//在eligibleAdvisors集合首位加入ExposeInvocationInterceptor增强
+		//ExposeInvocationInterceptor的作用是可以将当前的MethodInvocation暴露为一个thread-local对象,该拦截器很少使用
+		//使用场景:一个切点(例如AspectJ表达式切点)需要知道它的全部调用上线文环境
 		extendAdvisors(eligibleAdvisors);
 		if (!eligibleAdvisors.isEmpty()) {
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);
