@@ -18,7 +18,14 @@
         <servlet-name>example</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
-
+    <servlet>
+        <servlet-name>myServlet</servlet-name>
+        <servlet-class>com.luozl.TestServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>myServlet</servlet-name>
+        <url-pattern>/myServlet</url-pattern>
+    </servlet-mapping>
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:spring-context.xml</param-value>

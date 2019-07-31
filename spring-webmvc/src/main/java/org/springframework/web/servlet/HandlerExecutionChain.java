@@ -40,9 +40,9 @@ public class HandlerExecutionChain {
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
 	private final Object handler;
-
+	//拦截器数组
 	private HandlerInterceptor[] interceptors;
-
+	//拦截器集合
 	private List<HandlerInterceptor> interceptorList;
 
 	private int interceptorIndex = -1;
