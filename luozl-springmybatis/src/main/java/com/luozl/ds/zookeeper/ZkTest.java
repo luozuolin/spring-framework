@@ -6,7 +6,7 @@ import org.apache.zookeeper.data.Stat;
 import java.io.IOException;
 
 public class ZkTest {
-    private static final String CONNECT_STRING="10.10.182.37:2181";
+    private static final String CONNECT_STRING="127.0.0.1:2181";
     private static final int SESSOIN_TIEOUT=3000;
     public static void main(String[] args) throws IOException, KeeperException, InterruptedException {
         Watcher allChangeWatcher=new Watcher() {
@@ -17,9 +17,9 @@ public class ZkTest {
             }
         };
         ZooKeeper zooKeeper=new ZooKeeper(CONNECT_STRING,SESSOIN_TIEOUT,allChangeWatcher);
-        zooKeeper.create("/zktest","zktestvalue".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-        System.out.println("Create new node zktest");
-        Stat beforeStat= zooKeeper.exists("zktest",true);
-        System.out.println("Stat of 'zktest' before change:"+beforeStat.toString());
+        zooKeeper.create("/zktest1","zktestvalue1".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+        System.out.println("Create new node zktest1");
+        Stat beforeStat= zooKeeper.exists("/zktest1",true);
+        System.out.println("Stat of 'zktest1' before change:"+beforeStat.toString());
     }
 }
